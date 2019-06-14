@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/AngularDevToolFeature_1.0.1.9.jar" id="AngularDevToolFeature" version="1.0.1.9"/>
+   <feature url="features/AngularDevToolFeature_1.0.2.0.jar" id="AngularDevToolFeature" version="1.0.2.0"/>
 </site>
