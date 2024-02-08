@@ -76,6 +76,7 @@ public class ClientCredentialAccessToken implements HostnameVerifier {
 		String redisPwd = getSecret(REDIS_CREDENTIAL_SECRET_NAME, "password");
 		RedisCacheUtil redis = new RedisCacheUtil(this.REDIS_HOST, this.REDIS_PORT, redisUser, redisPwd);
 		String tokenCacheKey = "SCAUTH:${clientId}:${clientScope}:" + tokenEndPoint; // ?
+		// Check if token in redis cache. Return if yes 
 		String cacheValue = redis.getCacheValue(tokenCacheKey);
 		if (cacheValue != null) {
 			ObjectMapper mapper = new ObjectMapper();
@@ -122,8 +123,8 @@ public class ClientCredentialAccessToken implements HostnameVerifier {
 		if (https.getResponseCode() == 200) {
 			responseStream = new BufferedInputStream(https.getInputStream());
 		} else {
+			responseStream = new BufferedInputStream(https.getErrorStream());
 		}
-		responseStream = new BufferedInputStream(https.getErrorStream());
 		responseStreamReader = new BufferedReader(new InputStreamReader(responseStream));
 		String line = "";
 		StringBuilder stringBuilder = new StringBuilder();
@@ -135,7 +136,7 @@ public class ClientCredentialAccessToken implements HostnameVerifier {
 		this.clientCredentialsAccessTokenEntity = (ClientCredentialsAccessTokenEntity) mapper.readValue(response,
 				ClientCredentialsAccessTokenEntity.class);
 		this.clientCredentialsAccessTokenEntity.setStatuscode(Integer.valueOf(https.getResponseCode()));
-
+		// save token to redis cache
 		redis.upsertCacheEntry(tokenCacheKey, cacheValue, false);
 		return this.clientCredentialsAccessTokenEntity;
 	}
